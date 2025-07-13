@@ -1,0 +1,21 @@
+export default [
+	{
+		input: 'dist/esm/index.js',
+		output: [
+			{
+				file: 'dist/index.cjs.js',
+				format: 'cjs',
+				sourcemap: true,
+				inlineDynamicImports: true,
+			},
+		],
+		external: [
+			'capacitor-native-navigation',
+			'capacitor-native-navigation-vue',
+			'@capacitor/core',
+			'vue',
+			'vue-router',
+			'path-to-regexp',
+		],
+	},
+]

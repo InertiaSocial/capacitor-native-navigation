@@ -1,0 +1,53 @@
+{
+	"name": "capacitor-native-navigation-vue-router",
+	"version": "7.0.0",
+	"description": "Vue Router support for Native navigation for Capacitor apps",
+	"type": "module",
+	"main": "dist/plugin.cjs.js",
+	"module": "dist/esm/index.js",
+	"types": "dist/esm/index.d.ts",
+	"files": [
+		"dist/"
+	],
+	"exports": {
+		".": "./dist/esm/index.js"
+	},
+	"author": "",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cactuslab/capacitor-native-navigation.git"
+	},
+	"bugs": {
+		"url": "https://github.com/cactuslab/capacitor-native-navigation/issues"
+	},
+	"keywords": [
+		"capacitor",
+		"plugin",
+		"native",
+		"vue",
+		"vue-router"
+	],
+	"scripts": {
+		"build": "tsc && rollup -c rollup.config.mjs",
+		"clean": "rimraf ./dist",
+		"watch": "tsc --watch",
+		"prepublishOnly": "pnpm run build"
+	},
+	"dependencies": {
+		"capacitor-native-navigation": "workspace:*",
+		"capacitor-native-navigation-vue": "workspace:*",
+		"path-to-regexp": "^8.2.0"
+	},
+	"devDependencies": {
+		"@capacitor/core": "^7.2.0",
+		"@vue/tsconfig": "^0.7.0",
+		"capacitor-native-navigation": "workspace:*",
+		"vue-router": "^4.4.5"
+	},
+	"peerDependencies": {
+		"@capacitor/core": ">=5",
+		"vue": "^3",
+		"vue-router": "^4"
+	}
+}
