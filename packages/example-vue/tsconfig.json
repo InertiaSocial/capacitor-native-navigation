@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowUnreachableCode": false,
+    "declaration": true,
+    "esModuleInterop": true,
+    "inlineSources": true,
+    "lib": ["dom", "ESNext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "dist/esm",
+    "pretty": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "esnext",
+    "jsx": "preserve"
+  },
+  "include": [
+    "./src/js"
+  ]
+}

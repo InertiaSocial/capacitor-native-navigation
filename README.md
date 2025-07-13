@@ -422,9 +422,12 @@ pnpm changeset
 
 Include the file generated in `./changeset` in your commit.
 
-### Example app
+### Example apps
 
-Build and run the [Example app](./packages/example) to try it out.
+Build and run the example apps to try it out:
+
+- [React Example](./packages/example) - Demonstrates React integration
+- [Vue Example](./packages/example-vue) - Demonstrates Vue integration
 
 ### Linking to your app in development
 

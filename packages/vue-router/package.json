@@ -10,7 +10,8 @@
 		"dist/"
 	],
 	"exports": {
-		".": "./dist/esm/index.js"
+		".": "./dist/esm/index.js",
+		"./NativeNavigationRouter.vue": "./src/NativeNavigationRouter.vue"
 	},
 	"author": "",
 	"license": "MIT",

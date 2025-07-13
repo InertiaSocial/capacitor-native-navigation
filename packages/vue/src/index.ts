@@ -1,10 +1,11 @@
 import { initViewHandler } from 'capacitor-native-navigation'
 import type { ComponentId, CreateViewEventData, NativeNavigationPluginInternal, NativeNavigationPlugin, UpdateViewEventData, MessageEventData, ComponentAlias } from 'capacitor-native-navigation'
 import type { Plugin } from '@capacitor/core'
-import { createApp, type App, type Component } from 'vue'
+import { createApp, type App, type Component, defineComponent, h } from 'vue'
 
 import { initSync, prepareWindowForSync } from './sync'
 import { NativeNavigationVue, NativeNavigationVueView, VueViewListenerEvent, VueViewListenerFunc, toNativeNavigationViewProps } from './types'
+import { provideNativeNavigation } from './internal'
 
 export { useNativeNavigationViewContext, provideNativeNavigationViewContext } from './context'
 export { NativeNavigationViewProps, NativeNavigationVue } from './types'
@@ -88,8 +89,51 @@ export function initVue(options: Options): NativeNavigationVue {
 				viewsByAlias[alias] = view
 			}
 
-			// Mount the Vue app
-			app.mount(rootElement)
+			// Provide native navigation context to the app using the existing function
+			const nativeNavigationInstance = {
+				plugin,
+				addViewsListener(listener: VueViewListenerFunc) {
+					listeners.push(listener)
+					return function() {
+						const i = listeners.indexOf(listener)
+						if (i !== -1) {
+							listeners.splice(i, 1)
+						}
+					}
+				},
+				views() {
+					return views
+				},
+				view(id: ComponentId | ComponentAlias) {
+					return views[id as ComponentId] || viewsByAlias[id as ComponentAlias]
+				},
+				fireViewReady(id: ComponentId) {
+					internalPlugin.viewReady({
+						id,
+					}).catch(function(reason: unknown) {
+						reportError('viewReady', reason)
+					})
+				},
+			}
+
+			// Set up the provide function in the app context
+			app.config.globalProperties.$provide = (key: any, value: any) => {
+				app.provide(key, value)
+			}
+
+			// Use a wrapper component that provides the context
+			const AppWithProvider = defineComponent({
+				setup() {
+					provideNativeNavigation(nativeNavigationInstance)
+					return () => h(root, toNativeNavigationViewProps(data, viewWindow))
+				}
+			})
+
+			// Replace the app instance with the wrapped version
+			view.app = createApp(AppWithProvider)
+
+			// Mount the Vue app with provider
+			view.app.mount(rootElement)
 
 			fireViewDidChange(view, 'create')
 		} else {

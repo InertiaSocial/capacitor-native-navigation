@@ -1,6 +1,7 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": false,
     "allowUnreachableCode": false,
     "declaration": true,
     "declarationMap": true,
@@ -9,6 +10,7 @@
     "lib": ["dom", "es2020"],
     "module": "esnext",
     "moduleResolution": "node",
+    "noEmit": false,
     "noFallthroughCasesInSwitch": true,
     "outDir": "./dist/esm",
     "pretty": true,
