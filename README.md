@@ -1,18 +1,26 @@
 # Capacitor Native Navigation
 
-Capacitor Native Navigation is a plugin for [Capacitor](https://capacitorjs.com/) that allows a React DOM application
+Capacitor Native Navigation is a plugin for [Capacitor](https://capacitorjs.com/) that allows React DOM and Vue applications
 to use native UI for views, stacks and tabs.
 
-The traditional method of using React DOM on native is to either mimic native navigation transitions or to simply behave like a webapp
+The traditional method of using React DOM or Vue on native is to either mimic native navigation transitions or to simply behave like a webapp
 without transitions and without a native backstack. Capacitor Native Navigation lets you use all of the native navigation containers from
-React DOM, often transparently, so you have the best of native and web.
+React DOM or Vue, often transparently, so you have the best of native and web.
 
 ## Installation
 
-To install Capacitor Native Navigation in your app we add the required packages to your app... these are the packages usually required for a React app using ReactRouter:
+To install Capacitor Native Navigation in your app we add the required packages to your app.
+
+For **React** apps using React Router:
 
 ```shell
 pnpm add capacitor-native-navigation capacitor-native-navigation-react capacitor-native-navigation-react-router
+```
+
+For **Vue** apps using Vue Router:
+
+```shell
+pnpm add capacitor-native-navigation capacitor-native-navigation-vue capacitor-native-navigation-vue-router
 ```
 
 ### Tips & Tricks
@@ -160,11 +168,55 @@ initReact({
 
 [capacitor-native-navigation-react](./packages/react)
 
+## Vue
+
+Capacitor Native Navigation integrates with [Vue](https://vuejs.org/) to render Vue components for each view or screen in the app. Each view has a path (and search, hash and state), which is used to work out which components to show; often using a routing library such as Vue Router ([see below](#vue-router)).
+
+The Vue integration is activated by calling `initVue` and passing a reference to the `NativeNavigation` plugin, and the root component that will render each view.
+
+```typescript
+import { NativeNavigation } from 'capacitor-native-navigation'
+import { initVue, type NativeNavigationVueRootProps } from 'capacitor-native-navigation-vue'
+import { defineComponent } from 'vue'
+
+const Root = defineComponent({
+  props: {
+    componentId: String,
+    path: String,
+    search: String,
+    hash: String,
+    state: Object,
+    stack: String,
+    pathname: String,
+    href: String
+  },
+  setup(props: NativeNavigationVueRootProps) {
+    // Your root component logic here
+    return () => {
+      // Your template here
+    }
+  }
+})
+
+initVue({
+  plugin: NativeNavigation,
+  root: Root,
+})
+```
+
+[capacitor-native-navigation-vue](./packages/vue)
+
 ### Differences to React DOM
 
 Capacitor Native Navigation tries as much as possible to be a seamless adaptation of React DOM to native, however there are some differences that you should be aware of.
 
 Each view is mounted as a separate React portal. Views in a _stack_ remain mounted, even when not the frontmost in the stack, so they continue to respond to state changes (such as Redux, or timers), even if they're not currently visible. Be careful not to trigger unintentional side-effects such as navigation from a component that is not visible.
+
+### Differences to Vue Web
+
+Capacitor Native Navigation tries as much as possible to be a seamless adaptation of Vue to native, however there are some differences that you should be aware of.
+
+Each view is mounted as a separate Vue application instance. Views in a _stack_ remain mounted, even when not the frontmost in the stack, so they continue to respond to state changes (such as Pinia stores, or timers), even if they're not currently visible. Be careful not to trigger unintentional side-effects such as navigation from a component that is not visible.
 
 ## React Router
 
@@ -200,6 +252,53 @@ export default function Root(props: NativeNavigationReactRootProps): JSX.Element
 ```
 
 [capacitor-native-navigation-react-router](./packages/react-router)
+
+## Vue Router
+
+Capacitor Native Navigation transparently integrates with [Vue Router](https://router.vuejs.org/) so that the `router.push()`, `router.replace()` and `router.go()` functions
+translate pushes, replaces and backs into their native equivalent. This enables Capacitor Native Navigation to be very loosely coupled
+with your app; you start with a separate native entrypoint, but then reuse all of your web routing and navigation (`router.push`, `router-link`, etc)
+code.
+
+The root view component receives all of the location information from Capacitor Native Navigation in its props. We use the `useNativeNavigationRouter` composable to create native navigation integration.
+
+```typescript
+import { createRouter, createWebHistory } from 'vue-router'
+import { NativeNavigation } from 'capacitor-native-navigation'
+import { type NativeNavigationVueRootProps } from 'capacitor-native-navigation-vue'
+import { useNativeNavigationRouter } from 'capacitor-native-navigation-vue-router'
+import { defineComponent } from 'vue'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    // Your routes here
+  ]
+})
+
+export default defineComponent({
+  props: {
+    componentId: String,
+    path: String,
+    search: String,
+    hash: String,
+    state: Object,
+    stack: String,
+    pathname: String,
+    href: String
+  },
+  setup(props: NativeNavigationVueRootProps) {
+    const nativeRouter = useNativeNavigationRouter({
+      plugin: NativeNavigation,
+      modals: [],
+    })
+
+    return () => h('router-view')
+  }
+})
+```
+
+[capacitor-native-navigation-vue-router](./packages/vue-router)
 
 ### Modals
 
@@ -338,7 +437,11 @@ pnpm run link
 Then in your app (adjust the package list to match the packages you have installed):
 
 ```shell
+# For React apps:
 pnpm link --global capacitor-native-navigation capacitor-native-navigation-react capacitor-native-navigation-react-router
+
+# For Vue apps:
+pnpm link --global capacitor-native-navigation capacitor-native-navigation-vue capacitor-native-navigation-vue-router
 ```
 
 Remember this will break every time you run `pnpm install`, so to make it semi-permanent change the `package.json` to use
